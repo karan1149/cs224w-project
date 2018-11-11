@@ -21,7 +21,7 @@ embeddings = []
 
 parser = argparse.ArgumentParser(description='Compute CNN embeddings')
 
-parser.add_argument('output_file', help='Output CNN embeddings txt file.', default='cnn_embeddings.txt', required=False)
+parser.add_argument('output_file', help='Output CNN embeddings txt file.', default='cnn_embeddings.txt')
 parser.add_argument('--cuda', help='Whether to use GPU.', action='store_true')
 
 args = parser.parse_args()
