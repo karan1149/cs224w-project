@@ -59,8 +59,12 @@ def save_embeddings(directory='data/flickr_images'):
       num_images = len(images)
       num_total_images += num_images
 
+      if not num_images:
+        continue
+
       print('--- SUBDIR {:>3} OUT OF {:>3}: {:<35} with {:>4} images ............ '.format(str(subdir_idx + 1), str(num_subdirs), '[%s]' % subdir, str(num_images)), end='\r', flush=True)
       begin_time = time.time()
+
 
       batch = Variable(torch.zeros(num_images, 3, 224, 224))
 
@@ -86,6 +90,7 @@ def save_embeddings(directory='data/flickr_images'):
       for i in range(len(images)):
         line = img_id + ' ' + ' '.join(map(lambda x: str(x), embeddings[-1].data.numpy()[i].flatten())) + '\n'
         embedding_file.write(line)
+      return
 
       print('--- SUBDIR {:>3} OUT OF {:>3}: {:<35} with {:>4} images ............ time: {:>10}s'.format(str(subdir_idx + 1), str(num_subdirs), '[%s]' % subdir, str(num_images), '%f' % (time.time() - begin_time)))
 
