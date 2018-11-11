@@ -62,7 +62,7 @@ def save_embeddings(directory='data/flickr_images'):
       print('--- SUBDIR {:>3} OUT OF {:>3}: {:<35} with {:>4} images ............ '.format(str(subdir_idx + 1), str(num_subdirs), '[%s]' % subdir, str(num_images)), end='\r', flush=True)
       begin_time = time.time()
 
-      batch = torch.zeros(num_images, 3, 224, 224)
+      batch = Variable(torch.zeros(num_images, 3, 224, 224))
 
       for i, (img, img_id) in enumerate(images):
         assert(img_id in relevant_nodes)
