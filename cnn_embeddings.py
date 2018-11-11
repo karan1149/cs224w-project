@@ -29,7 +29,7 @@ args = parser.parse_args()
 def save_output(module, input, output):
     embeddings.append(output)
 
-model = models.resnet50(pretrained=True) # change this to desired model
+model = models.resnet18(pretrained=True) # change this to desired model
 for param in model.parameters():
     param.requires_grad = False
 model.eval()
@@ -114,6 +114,6 @@ def save_embeddings(directory='data/flickr_images'):
       print('--- SUBDIR {:>3} OUT OF {:>3}: {:<35} with {:>4} images ............ time: {:>10}s'.format(str(subdir_idx + 1), str(num_subdirs), '[%s]' % subdir, str(num_images), '%f' % (time.time() - begin_time)))
 
   print('TOTAL NUMBER OF IMAGES:', num_total_images)
-  
+
 if __name__=='__main__':
 save_embeddings()
