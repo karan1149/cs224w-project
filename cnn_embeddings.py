@@ -103,10 +103,12 @@ def save_embeddings(directory='data/flickr_images'):
       last_embeddings_len += 1
 
       if args.cuda:
-        embeddings[-1].data.cpu()
+        batch_results = embeddings[-1].data.cpu().numpy()
+      else:
+        batch_results = embeddings[-1].data.numpy()
 
       for i in range(len(images)):
-        line = img_id + ' ' + ' '.join(map(lambda x: str(x), embeddings[-1].data.numpy()[i].flatten())) + '\n'
+        line = img_id + ' ' + ' '.join(map(lambda x: str(x), batch_results[i].flatten())) + '\n'
         embedding_file.write(line)
 
       print('--- SUBDIR {:>3} OUT OF {:>3}: {:<35} with {:>4} images ............ time: {:>10}s'.format(str(subdir_idx + 1), str(num_subdirs), '[%s]' % subdir, str(num_images), '%f' % (time.time() - begin_time)))
