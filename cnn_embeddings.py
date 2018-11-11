@@ -102,9 +102,10 @@ def save_embeddings(directory='data/flickr_images'):
       assert(len(embeddings) == last_embeddings_len + 1)
       last_embeddings_len += 1
 
+      if args.cuda:
+        embeddings[-1].data.cpu()
+
       for i in range(len(images)):
-        if args.cuda:
-          embeddings[-1].cpu()
         line = img_id + ' ' + ' '.join(map(lambda x: str(x), embeddings[-1].data.numpy()[i].flatten())) + '\n'
         embedding_file.write(line)
 
