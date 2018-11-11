@@ -12,12 +12,19 @@ import os
 import random
 import operator
 from scipy.spatial.distance import cosine
+import argparse
 
 with open('data/relevant_nodes_set.pkl', 'rb') as f:
   relevant_nodes = pickle.load(f)
 
 embeddings = []
 
+parser = argparse.ArgumentParser(description='Compute CNN embeddings')
+
+parser.add_argument('output_file', help='Output CNN embeddings txt file.', default='cnn_embeddings.txt')
+parser.add_argument('--cuda', help='Whether to use GPU.', action='store_true')
+
+args = parser.parse_args()
 
 def save_output(module, input, output):
     embeddings.append(output)
@@ -33,6 +40,9 @@ normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                  std=[0.229, 0.224, 0.225])
 to_tensor = transforms.ToTensor()
 
+if args.cuda:
+  model.cuda()
+
 def get_vector(image_name):
     img = Image.open(image_name)
     img_tensor = Variable(normalize(to_tensor(scaler(img))).unsqueeze(0))
@@ -44,7 +54,7 @@ def save_embeddings(directory='data/flickr_images'):
   last_embeddings_len = len(embeddings)
 
   num_total_images = 0
-  with open('cnn_embeddings.txt', 'w') as embedding_file:   
+  with open(args.output_file, 'w') as embedding_file:   
     num_subdirs = len(subdirs)
     for subdir_idx, subdir in enumerate(subdirs):
       subdir_path = os.path.join(directory, subdir)
@@ -66,7 +76,7 @@ def save_embeddings(directory='data/flickr_images'):
       begin_time = time.time()
 
 
-      batch = Variable(torch.zeros(num_images, 3, 224, 224))
+      batch = torch.zeros(num_images, 3, 224, 224)
 
       for i, (img, img_id) in enumerate(images):
         assert(img_id in relevant_nodes)
@@ -83,6 +93,10 @@ def save_embeddings(directory='data/flickr_images'):
 
         # line = img_id + ' ' + ' '.join(map(lambda x: str(x), embeddings[-1].data.numpy().flatten())) + '\n'
         # embedding_file.write(line)
+      if args.cuda:
+        batch = Variable(batch.cuda())
+      else:
+        batch = Variable(batch)
       model(batch)
       assert(len(embeddings) == last_embeddings_len + 1)
       last_embeddings_len += 1
