@@ -6,18 +6,27 @@ import torchvision.models as models
 import torchvision.transforms as transforms
 from torch.autograd import Variable
 from PIL import Image
+import time
+import pickle
 import os
+import random
+import operator
+from scipy.spatial.distance import cosine
+
+with open('data/relevant_nodes_set.pkl', 'rb') as f:
+  relevant_nodes = pickle.load(f)
 
 embeddings = []
+
 
 def save_output(module, input, output):
     embeddings.append(output)
 
-model = models.resnet50(pretrained=True)
+model = models.resnet18(pretrained=True) # change this to desired model
 for param in model.parameters():
     param.requires_grad = False
 model.eval()
-hook = model.layer4[0].conv2.register_forward_hook(save_output)
+hook = model.avgpool.register_forward_hook(save_output)
 
 scaler = transforms.Resize((224, 224))
 normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
@@ -34,9 +43,10 @@ def save_embeddings(directory='data/flickr_images'):
   subdirs = os.listdir(directory)
   last_embeddings_len = len(embeddings)
 
-  num_images = 0
+  num_total_images = 0
   with open('cnn_embeddings.txt', 'w') as embedding_file:   
-    for subdir in subdirs:
+    num_subdirs = len(subdirs)
+    for subdir_idx, subdir in enumerate(subdirs):
       subdir_path = os.path.join(directory, subdir)
       if not os.path.isdir(subdir_path):
         continue
@@ -44,29 +54,63 @@ def save_embeddings(directory='data/flickr_images'):
       images = os.listdir(subdir_path)
       images = [img for img in images if '.jpg' in img]
 
-      num_images += len(images)
+      num_images = len(images)
+      num_total_images += num_images
 
-      # batch = torch.zeros(len(images), 3, 224, 224)
+      print('--- SUBDIR {:>3} OUT OF {:>3}: {:<35} with {:>4} images ............ '.format(str(subdir_idx + 1), str(num_subdirs), '[%s]' % subdir, str(num_images)), end='\r', flush=True)
+      begin_time = time.time()
 
       for i, img in enumerate(images):
+        img_id = img[:-4].split('_')[1]
+        if img_id not in relevant_nodes:
+          continue
+
         img_tensor = get_vector(os.path.join(subdir_path, img))
-        # batch[i] = img_tensor
         model(img_tensor)
-        print embeddings[-1].size()
+        print('--- SUBDIR {:>3} OUT OF {:>3}: {:<35} with {:>4} images ............ {:<10}'.format(str(subdir_idx + 1), str(num_subdirs), '[%s]' % subdir, str(num_images), '[%d/%d]' % (i, num_images)), end='\r', flush=True)
 
         assert(len(embeddings) == last_embeddings_len + 1)
         last_embeddings_len += 1
 
-        img_id = img[:-4].split('_')[1]
-        # line = img_id + ' '.join()
+        line = img_id + ' ' + ' '.join(map(lambda x: str(x), embeddings[-1].numpy().flatten())) + '\n'
+        embedding_file.write(line)
 
-      # print batch[0].data
-      # model(batch)
-      # print embeddings[-1].size
+      print('--- SUBDIR {:>3} OUT OF {:>3}: {:<35} with {:>4} images ............ time: {:>10}s'.format(str(subdir_idx + 1), str(num_subdirs), '[%s]' % subdir, str(num_images), '%f' % (time.time() - begin_time)))
+
+  print('TOTAL NUMBER OF IMAGES:', num_total_images)
 
 
-  print num_images
+def populate_embedding_map(embedding_file, embedding_map):
+  values_size = -1
+  with open(embedding_file, 'r') as file:
+    for line in file:
+      tokens = line.split()
+      values = [float(num) for num in tokens[1:]]
+
+      # Ensure all embeddings in a file are of the same size.
+      assert(values_size == -1 or values_size == len(values))
+      values_size = len(values)
+
+      embedding_map[tokens[0]] = values
+
+def find_similar_images(num_samples=1000000):
+  embedding_map = {}
+  similarities_map = {}
+
+  populate_embedding_map('cnn_embeddings_partial.txt', embedding_map)
+
+  ids = embedding_map.keys()
+  for i in range(num_samples):
+    id1, id2 = random.sample(ids, 2)
+    similarities_map[(id1, id2)] = cosine(embedding_map[id1], embedding_map[id2])
+
+  top10_pairs = dict(sorted(similarities_map.items(), key=operator.itemgetter(1), reverse=False)[:10])
+  for ids, cosine_val in top10_pairs.items():
+    print('MAX IDS: %s and %s (value = %s)' % (ids[0], ids[1], cosine_val))
+
+
 save_embeddings()
+# find_similar_images()
 
 
 
