@@ -67,14 +67,24 @@ def save_embeddings(directory='data/flickr_images'):
       for i, (img, img_id) in enumerate(images):
         assert(img_id in relevant_nodes)
 
+
+
         img_tensor = get_vector(os.path.join(subdir_path, img))
-        model(img_tensor)
-        print('--- SUBDIR {:>3} OUT OF {:>3}: {:<35} with {:>4} images ............ {:<10}'.format(str(subdir_idx + 1), str(num_subdirs), '[%s]' % subdir, str(num_images), '[%d/%d]' % (i, num_images)), end='\r', flush=True)
+        batch[i] = img_tensor
+        # model(img_tensor)
+        # print('--- SUBDIR {:>3} OUT OF {:>3}: {:<35} with {:>4} images ............ {:<10}'.format(str(subdir_idx + 1), str(num_subdirs), '[%s]' % subdir, str(num_images), '[%d/%d]' % (i, num_images)), end='\r', flush=True)
 
-        assert(len(embeddings) == last_embeddings_len + 1)
-        last_embeddings_len += 1
+        # assert(len(embeddings) == last_embeddings_len + 1)
+        # last_embeddings_len += 1
 
-        line = img_id + ' ' + ' '.join(map(lambda x: str(x), embeddings[-1].data.numpy().flatten())) + '\n'
+        # line = img_id + ' ' + ' '.join(map(lambda x: str(x), embeddings[-1].data.numpy().flatten())) + '\n'
+        # embedding_file.write(line)
+      model(batch)
+      assert(len(embeddings) == last_embeddings_len + 1)
+      last_embeddings_len += 1
+
+      for i in range(len(images)):
+        line = img_id + ' ' + ' '.join(map(lambda x: str(x), embeddings[-1].data.numpy()[i].flatten())) + '\n'
         embedding_file.write(line)
 
       print('--- SUBDIR {:>3} OUT OF {:>3}: {:<35} with {:>4} images ............ time: {:>10}s'.format(str(subdir_idx + 1), str(num_subdirs), '[%s]' % subdir, str(num_images), '%f' % (time.time() - begin_time)))
