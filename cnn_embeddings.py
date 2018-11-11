@@ -41,6 +41,7 @@ normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
 to_tensor = transforms.ToTensor()
 
 if args.cuda:
+  print("Transferring model to GPU.")
   model.cuda()
 
 def get_vector(image_name):
