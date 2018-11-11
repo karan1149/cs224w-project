@@ -21,7 +21,7 @@ embeddings = []
 
 parser = argparse.ArgumentParser(description='Compute CNN embeddings')
 
-parser.add_argument('output_file', help='Output CNN embeddings txt file.', default='cnn_embeddings.txt')
+parser.add_argument('output_file', help='Output CNN embeddings txt file.', default='cnn_embeddings.txt', required=False)
 parser.add_argument('--cuda', help='Whether to use GPU.', action='store_true')
 
 args = parser.parse_args()
@@ -103,6 +103,7 @@ def save_embeddings(directory='data/flickr_images'):
       last_embeddings_len += 1
 
       for i in range(len(images)):
+        embeddings[-1].data.cpu()
         line = img_id + ' ' + ' '.join(map(lambda x: str(x), embeddings[-1].data.numpy()[i].flatten())) + '\n'
         embedding_file.write(line)
 
