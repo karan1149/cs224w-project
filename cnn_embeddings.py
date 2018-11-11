@@ -54,16 +54,18 @@ def save_embeddings(directory='data/flickr_images'):
       images = os.listdir(subdir_path)
       images = [img for img in images if '.jpg' in img]
 
+      images = [(img, img[:-4].split('_')[1]) for img in images if img[:-4].split('_')[1] in relevant_nodes]
+
       num_images = len(images)
       num_total_images += num_images
 
       print('--- SUBDIR {:>3} OUT OF {:>3}: {:<35} with {:>4} images ............ '.format(str(subdir_idx + 1), str(num_subdirs), '[%s]' % subdir, str(num_images)), end='\r', flush=True)
       begin_time = time.time()
 
-      for i, img in enumerate(images):
-        img_id = img[:-4].split('_')[1]
-        if img_id not in relevant_nodes:
-          continue
+      batch = torch.zeros(num_images, 3, 224, 224)
+
+      for i, (img, img_id) in enumerate(images):
+        assert(img_id in relevant_nodes)
 
         img_tensor = get_vector(os.path.join(subdir_path, img))
         model(img_tensor)
