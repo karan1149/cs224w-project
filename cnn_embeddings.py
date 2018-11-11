@@ -116,4 +116,4 @@ def save_embeddings(directory='data/flickr_images'):
   print('TOTAL NUMBER OF IMAGES:', num_total_images)
 
 if __name__=='__main__':
-save_embeddings()
+  save_embeddings()
