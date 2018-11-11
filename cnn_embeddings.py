@@ -70,7 +70,7 @@ def save_embeddings(directory='data/flickr_images'):
 
 
         img_tensor = get_vector(os.path.join(subdir_path, img))
-        batch[i] = img_tensor
+        batch[i] = img_tensor.data
         # model(img_tensor)
         # print('--- SUBDIR {:>3} OUT OF {:>3}: {:<35} with {:>4} images ............ {:<10}'.format(str(subdir_idx + 1), str(num_subdirs), '[%s]' % subdir, str(num_images), '[%d/%d]' % (i, num_images)), end='\r', flush=True)
 
