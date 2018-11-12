@@ -26,12 +26,6 @@ def generate_embedding_file(content, unique, embed_prefix):
 			embed_string = " ".join([str(elem) for elem in embed_vector])
 			f.write(orig_id + " " + embed_string + "\n")
 
-	
-
-
-
-
-
 
 if __name__ == '__main__':
 	#### read in original edge list to create node mappings to generate files
@@ -45,15 +39,3 @@ if __name__ == '__main__':
 		#remap_nodes
 		generate_embedding_file(content, unique, "node2vec")
 		
-
-		
-		
-
-
-
-
-
-
-
-
-
