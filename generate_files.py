@@ -29,9 +29,9 @@ def generate_embedding_file(content, unique, embed_prefix):
 
 if __name__ == '__main__':
 	#### read in original edge list to create node mappings to generate files
-	with open('flickrEdges.txt', 'r') as f:
+	with open('data/flickrEdges.txt', 'r') as f:
 		content = f.readlines()
-		content = [x.strip().split() for x in content]
+		content = [x.strip().split() for x in content if not x.startswith('#')]
 		flat = [int(item) for sublist in content for item in sublist]
 		unique = list(set(flat))
 		unique.sort()
