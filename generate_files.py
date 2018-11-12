@@ -37,5 +37,5 @@ if __name__ == '__main__':
 		unique.sort()
 
 		#remap_nodes
-		generate_embedding_file(content, unique, "node2vec")
+		generate_embedding_file(content, unique, "sdne")
 		
