@@ -41,11 +41,11 @@ if __name__ == '__main__':
 
     if args.node2vec:
         models.append(
-            node2vec(d=128, max_iter=1, walk_len=80, num_walks=10, con_size=10, ret_p=1, inout_p=3)
+            node2vec(d=128, max_iter=1, walk_len=80, num_walks=10, con_size=10, ret_p=1, inout_p=5)
         )
 
     if args.sdne:
-        models.append(SDNE(d=128, beta=10, alpha=.2, nu1=1e-6, nu2=1e-6, K=3,n_units=[50, 15,], rho=0.3, n_iter=3, xeta=0.01,n_batch=200,
+        models.append(SDNE(d=128, beta=10, alpha=.2, nu1=1e-6, nu2=1e-6, K=3,n_units=[50, 15,], rho=0.3, n_iter=1, xeta=0.01,n_batch=200,
                         modelfile=['enc_model.json', 'dec_model.json'],
                         weightfile=['enc_weights.hdf5', 'dec_weights.hdf5']))
 
