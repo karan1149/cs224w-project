@@ -45,7 +45,7 @@ if __name__ == '__main__':
         )
 
     if args.sdne:
-        models.append(SDNE(d=128, beta=10, alpha=1e-6, nu1=1e-5, nu2=1e-4, K=3,n_units=[50, 15,], rho=0.3, n_iter=1, xeta=0.001,n_batch=200,
+        models.append(SDNE(d=32, beta=10, alpha=1e-6, nu1=1e-5, nu2=1e-4, K=3,n_units=[50, 15,], rho=0.3, n_iter=3, xeta=0.001,n_batch=200,
                         modelfile=['enc_model.json', 'dec_model.json'],
                         weightfile=['enc_weights.hdf5', 'dec_weights.hdf5']))
 
