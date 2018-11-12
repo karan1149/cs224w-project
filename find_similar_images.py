@@ -28,6 +28,6 @@ for i in tqdm(range(args.samples)):
   	id1, id2 = random.sample(ids, 2)
   similarities_map[(id1, id2)] = cosine(embedding_map[id1], embedding_map[id2])
 
-top10_pairs = dict(sorted(similarities_map.items(), key=operator.itemgetter(1), reverse=False)[:10])
-for ids, cosine_val in top10_pairs.items():
+top10_pairs = sorted(similarities_map.items(), key=operator.itemgetter(1), reverse=False)[:10]
+for ids, cosine_val in top10_pairs:
   print('MAX IDS: %s and %s (value = %s)' % (ids[0], ids[1], cosine_val))
