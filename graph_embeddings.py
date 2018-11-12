@@ -20,7 +20,7 @@ if __name__ == '__main__':
                         help='whether to run node2vec')
     parser.add_argument('--hope', '-hope', default=False,
                         help='whether to run HOPE')
-    parser.add_argument('--snde', '-sdne', default=False,
+    parser.add_argument('--sdne', '-sdne', default=False,
                         help='whether to run SDNE')
     
     args = parser.parse_args()
@@ -36,15 +36,15 @@ if __name__ == '__main__':
 
     models = []
     # Load the models you want to run
-    if hope:
+    if args.hope:
         models.append(HOPE(d=2, beta=0.01))
 
-    if node2vec:
+    if args.node2vec:
         models.append(
-            node2vec(d=128, max_iter=1, walk_len=80, num_walks=10, con_size=10, ret_p=1, inout_p=1, dr=0, w=0)
+            node2vec(d=128, max_iter=1, walk_len=80, num_walks=10, con_size=10, ret_p=1, inout_p=5)
         )
 
-    if sdne:
+    if args.sdne:
         models.append(SDNE(d=128, beta=10, alpha=.2, nu1=1e-6, nu2=1e-6, K=3,n_units=[50, 15,], rho=0.3, n_iter=3, xeta=0.01,n_batch=200,
                         modelfile=['enc_model.json', 'dec_model.json'],
                         weightfile=['enc_weights.hdf5', 'dec_weights.hdf5']))
