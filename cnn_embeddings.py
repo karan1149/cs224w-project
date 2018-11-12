@@ -29,7 +29,7 @@ args = parser.parse_args()
 def save_output(module, input, output):
     embeddings.append(output)
 
-model = models.resnet18(pretrained=True) # change this to desired model
+model = models.resnet50(pretrained=True) # change this to desired model
 for param in model.parameters():
     param.requires_grad = False
 model.eval()
