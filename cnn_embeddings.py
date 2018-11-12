@@ -107,7 +107,7 @@ def save_embeddings(directory='data/flickr_images'):
       else:
         batch_results = embeddings[-1].data.numpy()
 
-      for i in range(len(images)):
+      for i, (img, img_id) in enumerate(images):
         line = img_id + ' ' + ' '.join(map(lambda x: str(x), batch_results[i].flatten())) + '\n'
         embedding_file.write(line)
 

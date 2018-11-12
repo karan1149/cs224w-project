@@ -26,6 +26,9 @@ def populate_embedding_map(embedding_file, embedding_map):
 
 			# Ensure all embeddings in a file are of the same size.
 			assert(values_size == -1 or values_size == len(values))
+			if values_size == -1:
+				values_size = len(values)
+				print("Dimensionality of embeddings is %d..." % values_size)
 			values_size = len(values)
 
 			embedding_map[tokens[0]] = values
@@ -40,11 +43,17 @@ def compute_embedding_similarity(embedding_file1, embedding_file2, samples=10000
 
 	print("Finished populating embedding maps. Now sampling...")
 
-	assert(sorted(embeddings1.keys()) == sorted(embeddings2.keys()))
-
-	ids = sorted(embeddings1.keys())
-
-	assert(len(embeddings1[ids[0]]) == len(embeddings1[ids[0]]))
+	if sorted(embeddings1.keys()) != sorted(embeddings2.keys()):
+		print("WARNING: Keys are not the same for embeddings")
+		print("Embedding file 1 has %d ids" % len(embeddings1.keys()))
+		print("Embedding file 2 has %d ids" % len(embeddings2.keys()))
+		embeddings1_ids = set(embeddings1.keys())
+		embeddings2_ids = set(embeddings2.keys())
+		ids = list(embeddings1_ids.intersection(embeddings2_ids))
+		print("Embedding intersection has %d ids" % len(ids))
+	else:
+		ids = sorted(embeddings1.keys())
+		print("Embedding has %d ids" % len(ids))
 
 	similarities1 = []
 	similarities2 = []
