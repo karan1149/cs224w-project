@@ -57,7 +57,7 @@ if __name__ == '__main__':
         Y, t = embedding.learn_embedding(graph=G, edge_f=None, is_weighted=False, no_python=True)
         print (embedding._method_name+':\n\tTraining time: %f' % (time() - t1))
         print(Y)
-        Y.dump("node2vec_q5_embedding.dat")
+        Y.dump("sdne_embedding.dat")
         # Evaluate on graph reconstruction
         # MAP, prec_curv, err, err_baseline = gr.evaluateStaticGraphReconstruction(G, embedding, Y, None)
         # #---------------------------------------------------------------------------------
