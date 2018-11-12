@@ -16,11 +16,11 @@ if __name__ == '__main__':
     python run_karate.py -node2vec 1
     '''
     parser = ArgumentParser(description='Graph Embedding Experiments on Flickr Graph')
-    parser.add_argument('-node2vec', '--node2vec', default=False,
+    parser.add_argument('-node2vec', '--node2vec', action='store_true',
                         help='whether to run node2vec')
-    parser.add_argument('--hope', '-hope', default=False,
+    parser.add_argument('--hope', '-hope', action='store_true',
                         help='whether to run HOPE')
-    parser.add_argument('--sdne', '-sdne', default=False,
+    parser.add_argument('--sdne', '-sdne', action='store_true',
                         help='whether to run SDNE')
     
     args = parser.parse_args()
@@ -41,7 +41,7 @@ if __name__ == '__main__':
 
     if args.node2vec:
         models.append(
-            node2vec(d=128, max_iter=1, walk_len=80, num_walks=10, con_size=10, ret_p=1, inout_p=5)
+            node2vec(d=128, max_iter=1, walk_len=80, num_walks=10, con_size=10, ret_p=1, inout_p=3)
         )
 
     if args.sdne:
@@ -57,7 +57,7 @@ if __name__ == '__main__':
         Y, t = embedding.learn_embedding(graph=G, edge_f=None, is_weighted=False, no_python=True)
         print (embedding._method_name+':\n\tTraining time: %f' % (time() - t1))
         print(Y)
-        Y.dump("sdne_embedding.dat")
+        Y.dump("node2vec_q5_embedding.dat")
         # Evaluate on graph reconstruction
         # MAP, prec_curv, err, err_baseline = gr.evaluateStaticGraphReconstruction(G, embedding, Y, None)
         # #---------------------------------------------------------------------------------
