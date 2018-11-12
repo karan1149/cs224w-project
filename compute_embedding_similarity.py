@@ -7,11 +7,20 @@ from scipy.spatial.distance import cosine
 from scipy.stats import spearmanr
 from scipy.stats import pearsonr
 import numpy as np
+from tqdm import tqdm
+
+def get_total_lines(embedding_file):
+	lines = 0
+	with open(embedding_file, 'r') as f:
+		for line in f:
+			lines += 1
+	return lines
 
 def populate_embedding_map(embedding_file, embedding_map):
+	print("Populating embedding map from %s..." % embedding_file)
 	values_size = -1
 	with open(embedding_file, 'r') as file:
-		for line in file:
+		for line in tqdm(file, total=get_total_lines(embedding_file)):
 			tokens = line.split()
 			values = [float(num) for num in tokens[1:]]
 
@@ -29,6 +38,8 @@ def compute_embedding_similarity(embedding_file1, embedding_file2, samples=10000
 	populate_embedding_map(embedding_file1, embeddings1)
 	populate_embedding_map(embedding_file2, embeddings2)
 
+	print("Finished populating embedding maps. Now sampling...")
+
 	assert(sorted(embeddings1.keys()) == sorted(embeddings2.keys()))
 
 	ids = sorted(embeddings1.keys())
@@ -38,7 +49,7 @@ def compute_embedding_similarity(embedding_file1, embedding_file2, samples=10000
 	similarities1 = []
 	similarities2 = []
 
-	for i in range(samples):
+	for i in tqdm(range(samples)):
 		id1 = random.choice(ids)
 
 		while True:

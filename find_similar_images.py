@@ -4,6 +4,7 @@ from scipy.spatial.distance import cosine
 import random
 import operator
 import pickle
+from tqdm import tqdm
 
 parser = argparse.ArgumentParser(description='Find similar images by embeddings')
 
@@ -21,7 +22,7 @@ with open('data/relevant_nodes_set.pkl', 'rb') as f:
 	relevant_nodes = pickle.load(f)
 
 ids = embedding_map.keys()
-for i in range(args.samples):
+for i in tqdm(range(args.samples)):
   id1, id2 = random.sample(ids, 2)
   while id1 not in relevant_nodes or id2 not in relevant_nodes:
   	id1, id2 = random.sample(ids, 2)
