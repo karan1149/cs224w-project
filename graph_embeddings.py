@@ -27,7 +27,7 @@ if __name__ == '__main__':
 
     # File that contains the edges. Format: source target
     # Optionally, you can add weights as third column: source target weight
-    edge_f = 'flickrEdges_remapped.txt'
+    edge_f = 'flickrEdgesSmall.txt'
     # Specify whether the edges are directed
     isDirected = False
 
@@ -56,8 +56,8 @@ if __name__ == '__main__':
         # Learn embedding - accepts a networkx graph or file with edge list
         Y, t = embedding.learn_embedding(graph=G, edge_f=None, is_weighted=False, no_python=True)
         print (embedding._method_name+':\n\tTraining time: %f' % (time() - t1))
-        print(Y)
-        Y.dump("sdne_embedding.dat")
+        # print(Y)
+        # Y.dump("node2vec_subgraph_embedding.dat")
         # Evaluate on graph reconstruction
         # MAP, prec_curv, err, err_baseline = gr.evaluateStaticGraphReconstruction(G, embedding, Y, None)
         # #---------------------------------------------------------------------------------
