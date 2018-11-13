@@ -28,10 +28,10 @@ def populate_embedding_map(embedding_file, embedding_map):
 			assert(values_size == -1 or values_size == len(values))
 			if values_size == -1:
 				values_size = len(values)
-				print("Dimensionality of embeddings is %d..." % values_size)
 			values_size = len(values)
 
 			embedding_map[tokens[0]] = values
+	print("Dimensionality of embeddings is %d..." % values_size)
 
 def compute_embedding_similarity(embedding_file1, embedding_file2, samples=10000):
 	print("Computing similarity for files %s and %s using %d samples..." % (embedding_file1, embedding_file2, samples))
