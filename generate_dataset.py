@@ -4,8 +4,8 @@ import pickle
 from collections import Counter
 
 def read_embedding_file(input_file, labels):
+	print("Reading embedding file %s..." % input_file)
 	id_to_embed = {}
-	embed_labels = [] #tuples of (embed, label)
 	embed_size = None
 	with open(input_file, 'r') as ef:
 		line_count = 0
@@ -15,7 +15,7 @@ def read_embedding_file(input_file, labels):
 				image_id, embedding = content[0], [float(elem) for elem in content[1:]]
 				if embed_size is None:
 					embed_size = len(embedding)
-					print("embed_size is {}".format(embed_size))
+					print("Embed size is {}...".format(embed_size))
 				else:
 					assert(embed_size == len(embedding))
 
@@ -23,17 +23,8 @@ def read_embedding_file(input_file, labels):
 					id_to_embed[image_id] = embedding
 				line_count += 1
 
-		print("number of embeddings {}".format(line_count))
+		print("Number of embeddings found is {}...".format(line_count))
 		return id_to_embed
-
-	for image_id in id_to_embed:
-		embed_labels.append((id_to_embed[image_id], labels[image_id]))
-		output_labels.append(labels[image_id])
-
-	print(Counter(output_labels, most_common=True)
-	print("embed_labels length {}".format(len(embed_labels)))
-
-	pickle.dump(open(args.dataset_file, 'wb'), embed_labels))
 
 if __name__ == '__main__':
 	parser = ArgumentParser(description='generate image dataset of embeddings')
@@ -45,16 +36,43 @@ if __name__ == '__main__':
 	parser.add_argument('-concat_file', '--concat_file')
 
 	args = parser.parse_args()
-	labels = pickle.load(open(args.label_file, 'rb'))
-	print("number of labels {}".format(len(labels)))
-	print(Counter(labels.values(), most_common=True))
+
+	labels = {}
+	with open(args.label_file, 'r') as f:
+		for line in f:
+			image_id, label_str = line.split()
+			labels[image_id] = int(label_str)
+
+	print("Total number of labels in label file {}...".format(len(labels)))
+	print("Distribution of loaded labels:")
+
+	print(Counter(labels.values()).most_common())
+
 	id_to_embed = read_embedding_file(args.embed_file, labels)
+	if args.concat_file:
+		id_to_embed_concat = read_embedding_file(args.concat_file, labels)
 	output_labels = []
+	embed_labels = [] #tuples of (embed, label)
 
-    	
+	skipped_due_to_concatenation = 0
 
+	for image_id in id_to_embed:
+		if args.concat_file and image_id not in id_to_embed_concat:
+			skipped_due_to_concatenation += 1
+			continue
+		embedding = id_to_embed[image_id]
+		if args.concat_file:
+			embedding = embedding + id_to_embed_concat[image_id]
+		embed_labels.append((embedding, labels[image_id]))
+		output_labels.append(labels[image_id])
 
+	print("Distribution of labels in dataset:")
+	print(Counter(output_labels).most_common())
+	print("Number of tuples in dataset is {}".format(len(embed_labels)))
+	print("Dimensionality of embeddings in dataset is %d..." % len(embed_labels[0][0]))
+	if args.concat_file:
+		print("Number of tuples skipped due to concatenation file is %d" % skipped_due_to_concatenation)
 
+	pickle.dump(embed_labels, open(args.dataset_file, 'wb'))
 
-
-
+    
