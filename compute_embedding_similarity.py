@@ -8,6 +8,9 @@ from scipy.stats import spearmanr
 from scipy.stats import pearsonr
 import numpy as np
 from tqdm import tqdm
+import matplotlib.pyplot as plt
+from matplotlib.patches import Rectangle
+import os
 
 def get_total_lines(embedding_file):
 	lines = 0
@@ -32,6 +35,12 @@ def populate_embedding_map(embedding_file, embedding_map):
 
 			embedding_map[tokens[0]] = values
 	print("Dimensionality of embeddings is %d..." % values_size)
+
+def get_file_basename(filename):
+	return os.path.splitext(os.path.basename(filename))[0]
+
+def get_file_title(filename):
+	return os.path.splitext(os.path.basename(filename))[0].replace("_", " ").title()
 
 def compute_embedding_similarity(embedding_file1, embedding_file2, samples=10000):
 	print("Computing similarity for files %s and %s using %d samples..." % (embedding_file1, embedding_file2, samples))
@@ -66,8 +75,8 @@ def compute_embedding_similarity(embedding_file1, embedding_file2, samples=10000
 			if id2 != id1:
 				break
 
-		similarities1.append(cosine(embeddings1[id1], embeddings1[id2]))
-		similarities2.append(cosine(embeddings2[id1], embeddings2[id2]))
+		similarities1.append(min(max(cosine(embeddings1[id1], embeddings1[id2]), 0), 1))
+		similarities2.append(min(max(cosine(embeddings2[id1], embeddings2[id2]), 0), 1))
 
 	assert(len(similarities1) == len(similarities2) and len(similarities1) == samples)
 
@@ -76,6 +85,14 @@ def compute_embedding_similarity(embedding_file1, embedding_file2, samples=10000
 
 	print("Pearson correlation: %f" % pearson[0])
 	print("Spearman correlation: %f" % spearman[0])
+
+	plt.scatter(similarities1, similarities2, s=1)
+	plt.title("Distances of " + get_file_title(embedding_file1) + " vs. " + get_file_title(embedding_file2))
+	plt.xlabel("Distance according to " + get_file_title(embedding_file1))
+	plt.ylabel("Distance according to " + get_file_title(embedding_file2))
+	leg1 = Rectangle((0, 0), 0, 0, alpha=0.0)
+	plt.legend([leg1], ['Pearson = %.3f\nSpearman = %.3f' % (pearson[0], spearman[0])], handlelength=0)
+	plt.savefig('plots/' + get_file_basename(embedding_file1) + "__" + get_file_basename(embedding_file2) + '.png')
 
 if __name__=='__main__':
 	parser = argparse.ArgumentParser(description='Compare two sets of embeddings.')
