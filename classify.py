@@ -3,6 +3,7 @@ import pickle
 import sklearn
 from sklearn.neural_network import MLPClassifier
 from collections import Counter
+from sklearn.metrics import confusion_matrix
 
 if __name__=='__main__':
 
@@ -54,4 +55,12 @@ if __name__=='__main__':
 
 	test_accuracy = clf.score(test_data_x, test_data_y)
 	print("Test accuracy: %f" % test_accuracy)
+
+	print("Train confusion matrix:")
+	train_pred = clf.predict(train_data_x)
+	print(confusion_matrix(train_data_y, train_pred))
+
+	print("Test confusion matrix:")
+	test_pred = clf.predict(test_data_x)
+	print(confusion_matrix(test_data_y, test_pred))
 
