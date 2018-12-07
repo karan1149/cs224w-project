@@ -37,24 +37,6 @@ for label in images_per_label:
 
 # print(Counter([len(labels_per_image[image]) for image in labels_per_image], most_common=True))
 
-def unary_binary_analysis():
-  print(Counter([labels_per_image[image][0] for image in labels_per_image if len(labels_per_image[image]) <= 2]))
-
-  unary_images = set()
-  for image in labels_per_image:
-    if len(labels_per_image[image]) <= 2:
-      unary_images.add(image)
-
-  unary_images_per_label = defaultdict(list)
-
-  for image in unary_images:
-    unary_images_per_label[labels_per_image[image][0]].append(image)
-
-  for label in unary_images_per_label:
-    if len(unary_images_per_label[label]) > 5:
-      print(label, random.sample(unary_images_per_label[label], 5))
-
-# def animal_person_analysis():
 animal_classes = {'animal', 'birds', 'dog', 'cat', 'horses', 'fish', 'elk', 'cow', 'tiger', 'fox', 'whales', 'zebra'}
 
 person_animal_images = defaultdict(list)
@@ -115,12 +97,26 @@ def create_subgraph(person_images, animal_images):
 
   num_person = len([node for node in nodes_added if node in person_images])
   num_animal = len([node for node in nodes_added if node in animal_images])
-
   print("Induced graph has %d person images and %d animal images" % (num_person, num_animal))
+  
+  with open('person_animal_labels.txt', 'w') as f:
+    for node in nodes_added:
+      label = '0' if node in person_images else '1'
+      f.write(node + ' ' + label + '\n')
+
 
 create_subgraph(person_images, animal_images)
 
-# animal_person_analysis()
+# Num only person images is 50017
+# Num only animal images is 34006
+# Num both images is 1559
+# ('person: ', ['279733730', '2315582981', '161634252', '2678358533', '1804881117'])
+# ('animal: ', ['2689553007', '2308672664', '2649004764', '2742179333', '2449263849'])
+# ('both: ', ['2738469546', '710427749', '2539263822', '556965755', '283590026'])
+# 84023
+# Induced graph has 32899 unique nodes with 75742 edges
+# Induced graph has 18948 person images and 13951 animal images
+
 
 
 ###################### GENERAL LABEL ANALYSIS #####################
@@ -164,6 +160,24 @@ create_subgraph(person_images, animal_images)
 # 13: 1
 
 #################### UNARY (OR BINARY) IMAGE ANALYSIS #####################
+
+def unary_binary_analysis():
+  print(Counter([labels_per_image[image][0] for image in labels_per_image if len(labels_per_image[image]) <= 2]))
+
+  unary_images = set()
+  for image in labels_per_image:
+    if len(labels_per_image[image]) <= 2:
+      unary_images.add(image)
+
+  unary_images_per_label = defaultdict(list)
+
+  for image in unary_images:
+    unary_images_per_label[labels_per_image[image][0]].append(image)
+
+  for label in unary_images_per_label:
+    if len(unary_images_per_label[label]) > 5:
+      print(label, random.sample(unary_images_per_label[label], 5))
+
 
 # Label counts for unary images:
 # 'Labels_person.txt': 31617 +++
