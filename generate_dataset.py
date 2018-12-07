@@ -26,6 +26,12 @@ def read_embedding_file(input_file, labels):
 		print("Number of embeddings found is {}...".format(line_count))
 		return id_to_embed
 
+def populate_label_map(label_file, labels):
+	with open(label_file, 'r') as f:
+		for line in f:
+			image_id, label_str = line.split()
+			labels[image_id] = int(label_str)
+
 if __name__ == '__main__':
 	parser = ArgumentParser(description='generate image dataset of embeddings')
 	parser.add_argument('-embed_file', '--embed_file')
@@ -38,10 +44,7 @@ if __name__ == '__main__':
 	args = parser.parse_args()
 
 	labels = {}
-	with open(args.label_file, 'r') as f:
-		for line in f:
-			image_id, label_str = line.split()
-			labels[image_id] = int(label_str)
+	populate_label_map(args.label_file, labels)
 
 	print("Total number of labels in label file {}...".format(len(labels)))
 	print("Distribution of loaded labels:")
