@@ -6,7 +6,7 @@ def write_concat_file(embeddings, output_name):
 		for elem in embeddings:
 			embeddings[elem] = [str(x) for x in embeddings[elem]]
 			embed_string = " ".join(embeddings[elem])
-			f.write(str(elem) + " " + embed_string)
+			f.write(str(elem) + " " + embed_string + "\n")
 
 def get_embeddings(embed_file):
 	embeddings = defaultdict(list)
