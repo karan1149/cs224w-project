@@ -66,7 +66,7 @@ def create_subgraph(person_images, animal_images):
 
   nodes_to_include = person_images.union(animal_images)
   # print('num_images_per_class', num_images_per_class)
-  print(len(nodes_to_include))
+  print(len(nodes_to_include)) # 84023 total person and animal images
 
   input_edges = []
   input_nodes = set()
@@ -99,13 +99,18 @@ def create_subgraph(person_images, animal_images):
   num_animal = len([node for node in nodes_added if node in animal_images])
   print("Induced graph has %d person images and %d animal images" % (num_person, num_animal))
   
+  # Induced graph has 32899 unique nodes with 75742 edges
+  # Induced graph has 18948 person images and 13951 animal images
+
   with open('person_animal_labels.txt', 'w') as f:
     for node in nodes_added:
       label = '0' if node in person_images else '1'
       f.write(node + ' ' + label + '\n')
 
-
 create_subgraph(person_images, animal_images)
+
+
+
 
 # Num only person images is 50017
 # Num only animal images is 34006
