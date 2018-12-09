@@ -4,8 +4,8 @@ from collections import defaultdict
 def write_concat_file(embeddings, output_name):
 	with open(output_name, 'w') as f:
 		for elem in embeddings:
-			print(embeddings[elem])
-			embed_string = " ".join(str(embeddings[elem]))
+			embeddings[elem] = [str(x) for x in embeddings[elem]]
+			embed_string = " ".join(embeddings[elem])
 			f.write(str(elem) + " " + embed_string)
 
 def get_embeddings(embed_file):
