@@ -50,6 +50,8 @@ def create_subgraph(input_edges_filename, output_edges_filename, size, pick_popu
 
 	input_nodes = list(input_nodes)
 
+	print("Input nodes %d..." % len(input_nodes))
+
 	if args.pick_popular_nodes:
 		nodes_to_include = sorted([(c, n) for n, c in node_degrees.items()], reverse=True)[:size]
 
