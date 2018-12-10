@@ -3,9 +3,9 @@ from matplotlib import pyplot as plt
 import numpy as np
 
 
-def get_adj_matrix(labels_file, edges_file):
-  image_ids = [{}, {}] # index 0 = person, index 1 = animal
-  num_images = [0, 0] # index 0 = person, index 1 = animal
+def get_adj_matrix(labels_file, edges_file, num_classes, smb_file):
+  image_ids = [{} for _ in range(num_classes)] # index 0 = person, index 1 = animal
+  num_images = [0 for _ in range(num_classes)] # index 0 = person, index 1 = animal
 
   with open(labels_file, 'r') as f:
     for line in f:
@@ -14,12 +14,16 @@ def get_adj_matrix(labels_file, edges_file):
       image_ids[label][image_id] = num_images[label]
       num_images[label] += 1
 
-  for image_id, new_id in image_ids[1].items():
-    image_ids[1][image_id] = new_id + num_images[0]
+  num_images_in_prev_classes = 0
+  for i in range(1, num_classes):
+    num_images_in_prev_classes += num_images[i-1]
+    for image_id, new_id in image_ids[i].items():
+      image_ids[i][image_id] = new_id + num_images_in_prev_classes
 
   print("Creating combined map to new ordered ids... ")
-  person_ids, animal_ids = image_ids
-  combined_id_map = {**person_ids, **animal_ids}
+  combined_id_map = {}
+  for image_id_map in image_ids:
+    combined_id_map.update(image_id_map)
 
   print("Creating adjacency matrix...")
   A = np.ones((sum(num_images), sum(num_images)))
@@ -35,11 +39,11 @@ def get_adj_matrix(labels_file, edges_file):
       A[id2][id1] = 0
 
   plt.imshow(A, cmap='binary')
-  plt.savefig('visualize_person_animal_sbm_5000.png', dpi=1000)
+  plt.savefig(smb_file, dpi=1000)
   plt.clf()
 
 
-get_adj_matrix('person_animal_labels.txt', 'person_animal_edges.txt')
+get_adj_matrix('person_animal_plant_labels.txt', 'person_animal_plant_edges.txt', 3, 'visualize_person_animal_plant_sbm_1000.png')
 
 def compute_clustering_coeff(edges_file):
   G = snap.LoadEdgeList(snap.PUNGraph, edges_file, 0, 1)
