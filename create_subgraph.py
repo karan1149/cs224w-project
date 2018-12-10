@@ -2,11 +2,12 @@ import os
 import argparse
 import random
 from collections import defaultdict
+import pickle
 
 # Creates an induced subgraph from input_edges_filename with number of nodes
 # equal to size. Note that some nodes may be isolated, so they might not show
 # up in edge list.
-def create_subgraph(input_edges_filename, output_edges_filename, size, pick_popular_nodes=False):
+def create_subgraph(input_edges_filename, output_edges_filename, size, pick_popular_nodes=False, relevant_nodes=None):
 	print("Creating induced subgraph from %s, saving to %s, number of nodes is %d..." % (input_edges_filename, output_edges_filename, size))
 	if pick_popular_nodes:
 		print("Choosing subgraph based on degrees in original input graph...")
@@ -16,6 +17,12 @@ def create_subgraph(input_edges_filename, output_edges_filename, size, pick_popu
 	node_degrees = defaultdict(int)
 
 	self_edges = 0
+
+	if relevant_nodes:
+		with open(relevant_nodes, 'rb') as f:
+			relevant_nodes_set = pickle.load(f)
+
+		print("Loaded relevant nodes set with size %d..." % len(relevant_nodes_set))
 
 	with open(input_edges_filename, 'r') as f:
 		for line in f:
@@ -29,8 +36,10 @@ def create_subgraph(input_edges_filename, output_edges_filename, size, pick_popu
 			assert(int(right_node) > 0)
 			input_edges.append((left_node, right_node))
 
-			input_nodes.add(left_node)
-			input_nodes.add(right_node)
+			if relevant_nodes_set is None or left_node in relevant_nodes_set:
+				input_nodes.add(left_node)
+			if relevant_nodes_set is None or right_node in relevant_nodes_set:
+				input_nodes.add(right_node)
 
 			if left_node == right_node:
 				self_edges += 1
@@ -41,8 +50,10 @@ def create_subgraph(input_edges_filename, output_edges_filename, size, pick_popu
 
 	input_nodes = list(input_nodes)
 
+	print("Input nodes %d..." % len(input_nodes))
+
 	if args.pick_popular_nodes:
-		nodes_to_include = sorted([(c, n) for n, c in node_degrees.items()], reverse=True)[:2 * size]
+		nodes_to_include = sorted([(c, n) for n, c in node_degrees.items()], reverse=True)[:size]
 
 		input_nodes = [n for c, n in nodes_to_include]
 	
@@ -73,7 +84,8 @@ if __name__=='__main__':
 	parser.add_argument('output_edges_filename', help='Path to output edge file.')
 	parser.add_argument('size', help='Size of subgraph.', type=int,)
 	parser.add_argument('--pick_popular_nodes', help='If passed, graph includes only the nodes with highest degree in input graph', action='store_true')
+	parser.add_argument('--relevant_nodes', help='Pickle file containing a list of nodes. Only these nodes will be included in final result.')
 
 	args = parser.parse_args()
 
-	create_subgraph(args.input_edges_filename, args.output_edges_filename, args.size, args.pick_popular_nodes)
+	create_subgraph(args.input_edges_filename, args.output_edges_filename, args.size, args.pick_popular_nodes, args.relevant_nodes)

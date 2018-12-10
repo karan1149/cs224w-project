@@ -39,7 +39,7 @@ if __name__=='__main__':
 
 	print("Dimensionality of embeddings %d" % len(train_data_x[0]))
 
-	clf = MLPClassifier(hidden_layer_sizes=(), verbose=True)
+	clf = MLPClassifier(hidden_layer_sizes=(100,), verbose=True, early_stopping=True)
 
 	print("Classes found in training data:")
 	print(Counter(train_data_y).most_common())
